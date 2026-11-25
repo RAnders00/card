@@ -31,10 +31,22 @@ photographer = "isukan"
 source = "https://www.furtrack.com/p/2217584" # Optional post URL; when set, shows a right-aligned "View post" link
 
 [[photos]]
+file = "15_mabs_fullsuitfromtop.jpg"
+alt = "randers the lynx fursuiter in fullsuit from the top with minimalist bright background"
+photographer = "mabs"
+source = "https://www.furtrack.com/p/2392716" # Optional post URL; when set, shows a right-aligned "View post" link
+
+[[photos]]
 file = "20_mabs_partylookingsubmissive.jpg"
 alt = "Close-up of randers the lynx fursuiter wearing a flower crown under pink and blue lighting"
 photographer = "mabs"
 source = "https://www.furtrack.com/p/2196017"
+
+[[photos]]
+file = "25_mabs_fullsuitplain.jpg"
+alt = "randers the lynx fursuiter in fullsuit from the front, hands on hips"
+photographer = "mabs"
+source = "https://www.furtrack.com/p/2392718" # Optional post URL; when set, shows a right-aligned "View post" link
 
 [[photos]]
 file = "30_jikofox_ef2026parade.jpg"
