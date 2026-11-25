@@ -17,6 +17,10 @@ url = "https://jikofox.de/"
 name = "Yong"
 url = "https://x.com/pawmeier"
 
+[photographers.min]
+name = "MinKobl"
+url = "https://x.com/MinKobl"
+
 # Photos included in the Polaroid stack rotation.
 # Store image files inside the photos/ directory and reference their filename below.
 
@@ -49,3 +53,39 @@ file = "50_yong_party.jpg"
 alt = "randers the lynx at Eurofurence 2026 partying with arm warmers holding the paws up to the camera, kinda blurry"
 photographer = "yong"
 source = "https://www.furtrack.com/p/2195935"
+
+[[photos]]
+file = "60_yong_angy.jpg"
+alt = "randers the lynx at with angry looking eyelids, noisy analogue photograph"
+photographer = "yong"
+source = "https://www.furtrack.com/p/2012245"
+
+[[photos]]
+file = "70_yong_smoking.jpg"
+alt = "randers the lynx very close up & out of focus, with a plush cigarette in the maw"
+photographer = "yong"
+source = "https://www.furtrack.com/p/1990571"
+
+[[photos]]
+file = "80_min_blanket.jpg"
+alt = "randers the lynx together with Tarrik the Clep on a blanket, shot from above"
+photographer = "min"
+source = "https://www.furtrack.com/p/1930423"
+
+[[photos]]
+file = "90_isukan_sideprofile_pawbert.jpg"
+alt = "randers the lynx in a close up side profile with a pawbert sweater"
+photographer = "isukan"
+source = "https://www.furtrack.com/p/1914607"
+
+[[photos]]
+file = "100_yong_pawstoface.jpg"
+alt = "randers the lynx smothering a dude's face with his paws"
+photographer = "yong"
+source = "https://www.furtrack.com/p/1914224"
+
+[[photos]]
+file = "110_yong_bugaunderrock.jpg"
+alt = "randers the lynx from slightly above with eyelids"
+photographer = "yong"
+source = "https://www.furtrack.com/p/1505243"
