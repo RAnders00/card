@@ -17,6 +17,7 @@ export class PhotoRotator {
   private readonly pool: ResolvedPhoto[];
   private remaining: number[] = [];
   private lastIndex: number | null = null;
+  private inInitialCycle = false;
 
   constructor(pool: ResolvedPhoto[]) {
     this.pool = pool;
@@ -28,7 +29,7 @@ export class PhotoRotator {
 
   /**
    * Deterministically selects the first configured photo for initial page load
-   * and marks the remaining photos as unshown for subsequent random clicks.
+   * and queues the remaining photos in TOML order for the first playthrough.
    */
   initial(): ResolvedPhoto {
     if (this.pool.length === 0) {
@@ -37,12 +38,20 @@ export class PhotoRotator {
 
     this.lastIndex = 0;
     this.remaining = this.pool.map((_, i) => i).slice(1);
+    this.inInitialCycle = this.remaining.length > 0;
     return this.pool[0];
   }
 
   next(): ResolvedPhoto {
     if (this.pool.length === 0) {
       throw new Error('Photo pool must contain at least one photo.');
+    }
+
+    if (this.inInitialCycle && this.remaining.length > 0) {
+      const pickedIndex = this.remaining.shift()!;
+      this.inInitialCycle = this.remaining.length > 0;
+      this.lastIndex = pickedIndex;
+      return this.pool[pickedIndex];
     }
 
     if (this.remaining.length === 0) {
@@ -187,11 +196,30 @@ export function attachMotion(
     let isFocused = false;
     let isUserPaused = prefersReducedMotion;
 
-    const isSlideshowHeld = () =>
-      isUserPaused ||
-      isHovered ||
-      isFocused ||
-      document.visibilityState === 'hidden';
+    const isKeyboardFocused = (el: EventTarget | null): boolean => {
+      if (!(el instanceof Element)) return false;
+      try {
+        return el.matches(':focus-visible');
+      } catch {
+        return false;
+      }
+    };
+
+    const isSlideshowHeld = () => {
+      if (
+        isFocused &&
+        (!(document.activeElement instanceof Node) ||
+          !stack.contains(document.activeElement))
+      ) {
+        isFocused = false;
+      }
+      return (
+        isUserPaused ||
+        isHovered ||
+        isFocused ||
+        document.visibilityState === 'hidden'
+      );
+    };
 
     const syncRingGeometry = () => {
       if (!toggleBtn || !ringSvg || !ringRects || ringRects.length === 0) return;
@@ -269,7 +297,7 @@ export function attachMotion(
       resumeSlideshowTimer();
     };
 
-    const dropNextPolaroid = (fromUser = true) => {
+    const dropNextPolaroid = (fromUser = true, fromKeyboard = false) => {
       if (fromUser) {
         dismissHint();
       }
@@ -279,6 +307,27 @@ export function attachMotion(
       lastAngle = placement.rotateDeg;
 
       const previousTop = stack.querySelector<HTMLElement>('.polaroid-card.is-top');
+      const activeEl =
+        document.activeElement instanceof HTMLElement
+          ? document.activeElement
+          : null;
+      const focusedInPrevious = Boolean(
+        activeEl && previousTop?.contains(activeEl),
+      );
+      const preserveKeyboardFocus = fromKeyboard && focusedInPrevious;
+
+      const nextCard = createPolaroidCard(nextPhoto, placement, false);
+      stack.appendChild(nextCard);
+
+      if (preserveKeyboardFocus) {
+        nextCard
+          .querySelector<HTMLButtonElement>('.polaroid-photo-btn')
+          ?.focus({ preventScroll: true });
+      } else if (focusedInPrevious) {
+        activeEl?.blur();
+        isFocused = false;
+      }
+
       if (previousTop) {
         previousTop.classList.remove('is-top', 'is-dropping');
         previousTop.classList.add('is-buried');
@@ -287,9 +336,6 @@ export function attachMotion(
           .querySelectorAll<HTMLElement>('button, a')
           .forEach((el) => el.setAttribute('tabindex', '-1'));
       }
-
-      const nextCard = createPolaroidCard(nextPhoto, placement, false);
-      stack.appendChild(nextCard);
 
       // Cleanly cap DOM stack size so repeated clicks stay fast
       while (stack.children.length > MAX_STACK_SIZE) {
@@ -304,7 +350,7 @@ export function attachMotion(
       if (!target) return;
       // Allow Polaroid footer links ("Photo credit" / "View post") to open normally
       if (target.closest('a')) return;
-      dropNextPolaroid(true);
+      dropNextPolaroid(true, event.detail === 0);
     });
 
     if (rotator.size <= 1) {
@@ -338,22 +384,37 @@ export function attachMotion(
         pauseSlideshowTimer();
       });
 
+      stack.addEventListener('pointerdown', (event: PointerEvent) => {
+        if (event.pointerType !== 'mouse' || isHovered) return;
+        isHovered = true;
+        pauseSlideshowTimer();
+      });
+
       stack.addEventListener('pointerleave', (event: PointerEvent) => {
         if (event.pointerType !== 'mouse') return;
         isHovered = false;
         resumeSlideshowTimer();
       });
 
-      stack.addEventListener('focusin', () => {
-        isFocused = true;
-        pauseSlideshowTimer();
+      stack.addEventListener('focusin', (event: FocusEvent) => {
+        if (isKeyboardFocused(event.target)) {
+          isFocused = true;
+          pauseSlideshowTimer();
+        } else if (isFocused) {
+          isFocused = false;
+          resumeSlideshowTimer();
+        }
       });
 
       stack.addEventListener('focusout', (event: FocusEvent) => {
-        isFocused =
+        if (
           event.relatedTarget instanceof Node &&
-          stack.contains(event.relatedTarget);
-        if (!isFocused) {
+          stack.contains(event.relatedTarget)
+        ) {
+          return;
+        }
+        if (isFocused) {
+          isFocused = false;
           resumeSlideshowTimer();
         }
       });
