@@ -56,7 +56,11 @@ body {
   min-height: 100dvh;
   display: flex;
   flex-direction: column;
-  padding: clamp(1.25rem, 3.5vw, 3rem) clamp(1rem, 3vw, 2rem);
+  padding:
+    calc(clamp(1.25rem, 3.5vw, 3rem) + env(safe-area-inset-top, 0px))
+    calc(clamp(1rem, 3vw, 2rem) + env(safe-area-inset-right, 0px))
+    calc(clamp(1.25rem, 3.5vw, 3rem) + env(safe-area-inset-bottom, 0px))
+    calc(clamp(1rem, 3vw, 2rem) + env(safe-area-inset-left, 0px));
   overflow-x: clip;
 }
 
@@ -816,7 +820,11 @@ body {
 /* Narrow viewports: expand outer card shell outward to edges and fade it away */
 @media (max-width: 540px) {
   .photobooth-stage {
-    padding: 1.25rem 0.9rem;
+    padding:
+      calc(1.5rem + env(safe-area-inset-top, 0px))
+      calc(0.9rem + env(safe-area-inset-right, 0px))
+      calc(1.75rem + env(safe-area-inset-bottom, 0px))
+      calc(0.9rem + env(safe-area-inset-left, 0px));
   }
 
   .booth-card {
