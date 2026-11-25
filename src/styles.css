@@ -160,7 +160,7 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.9rem;
+  gap: 0.55rem;
   padding: 0.5rem 0.4rem;
 }
 
@@ -235,32 +235,120 @@ body {
   animation: paw-ripple-ring 0.85s var(--ease-spring) 0.72s forwards;
 }
 
-/* Tap Hint Label Below Polaroid */
+/* Slideshow Controls & Tap Hint Below Polaroid */
+.photo-controls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.slideshow-toggle {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 999px;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.02em;
+  color: var(--ink-subtle);
+  opacity: 0.78;
+  cursor: pointer;
+  transition:
+    background-color 0.22s ease,
+    color 0.22s ease,
+    opacity 0.22s ease;
+}
+
+.slideshow-toggle:hover {
+  opacity: 1;
+  background: rgba(84, 19, 32, 0.06);
+  color: var(--maroon-800);
+}
+
+.slideshow-toggle:focus-visible {
+  outline: 2.5px solid var(--maroon-800);
+  outline-offset: 2px;
+}
+
+.slideshow-toggle.is-paused {
+  background: transparent;
+  color: var(--maroon-800);
+  opacity: 0.92;
+}
+
+.slideshow-toggle__icon {
+  display: inline-flex;
+  width: 11px;
+  height: 11px;
+  color: currentColor;
+}
+
+.slideshow-toggle__icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.slideshow-toggle__icon--play {
+  display: none;
+}
+
+.slideshow-toggle.is-paused .slideshow-toggle__icon--pause {
+  display: none;
+}
+
+.slideshow-toggle.is-paused .slideshow-toggle__icon--play {
+  display: inline-flex;
+}
+
 .tap-hint {
+  position: absolute;
+  right: 10px;
+  bottom: 72px;
+  z-index: 7;
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
   margin: 0;
-  padding: 0.28rem 0.72rem;
-  border-radius: 999px;
-  background: rgba(255, 251, 240, 0.8);
-  border: 1px solid rgba(84, 19, 32, 0.14);
-  box-shadow: 0 4px 12px -4px rgba(61, 12, 23, 0.12);
+  padding: 0.34rem 0.72rem;
+  border-radius: 14px;
+  background: #fffdf7;
+  border: 1.5px solid rgba(84, 19, 32, 0.28);
+  box-shadow: 0 10px 22px -8px rgba(41, 7, 14, 0.28);
   font-family: var(--font-mono);
   font-size: 0.72rem;
-  letter-spacing: 0.03em;
+  font-weight: 500;
+  letter-spacing: 0.02em;
   color: var(--maroon-800);
   opacity: 0;
-  transform: translateY(6px);
+  transform: translateY(6px) scale(0.92);
   pointer-events: none;
   transition:
-    opacity 0.45s var(--ease-spring),
-    transform 0.45s var(--ease-spring);
+    opacity 0.38s var(--ease-spring),
+    transform 0.38s var(--ease-spring);
+}
+
+.tap-hint::before {
+  content: '';
+  position: absolute;
+  top: -5.5px;
+  left: 22px;
+  width: 9px;
+  height: 9px;
+  background: #fffdf7;
+  border-top: 1.5px solid rgba(84, 19, 32, 0.28);
+  border-left: 1.5px solid rgba(84, 19, 32, 0.28);
+  transform: rotate(45deg);
 }
 
 .tap-hint.is-visible {
   opacity: 1;
-  transform: translateY(0);
+  transform: translateY(0) scale(1);
 }
 
 .tap-hint__icon {

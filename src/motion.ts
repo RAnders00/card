@@ -2,9 +2,11 @@ import { createPolaroidCard, type PolaroidPlacement } from './render';
 import type { ResolvedPhoto } from './types';
 
 const MAX_STACK_SIZE = 5;
+const AUTO_ADVANCE_MS = 6000;
 const PAW_HINT_DELAY_MS = 2800;
 const PAW_TAP_IMPACT_MS = 780;
 const PAW_TAP_DURATION_MS = 1900;
+const TAP_HINT_VISIBLE_MS = 4500;
 
 /**
  * Shuffle-bag selector: draws randomly from unshown photos until all have been
@@ -18,6 +20,10 @@ export class PhotoRotator {
 
   constructor(pool: ResolvedPhoto[]) {
     this.pool = pool;
+  }
+
+  get size(): number {
+    return this.pool.length;
   }
 
   /**
@@ -108,9 +114,11 @@ export function attachMotion(
   const pawGuide = root.querySelector<HTMLElement>('.paw-guide');
   const tapHint = root.querySelector<HTMLElement>('.tap-hint');
   const tapHintText = root.querySelector<HTMLElement>('.tap-hint__text');
+  const toggleBtn = root.querySelector<HTMLButtonElement>('.slideshow-toggle');
+  const toggleLabel = root.querySelector<HTMLElement>('.slideshow-toggle__label');
 
   if (tapHintText && hasFinePointer) {
-    tapHintText.textContent = 'Click photo for more';
+    tapHintText.textContent = 'Click for more!';
   }
 
   if (stack) {
@@ -119,12 +127,14 @@ export function attachMotion(
     let hintDelayTimer: number | undefined;
     let impactTimer: number | undefined;
     let cleanupTimer: number | undefined;
+    let hintHideTimer: number | undefined;
 
     const dismissHint = () => {
       hasInteracted = true;
       window.clearTimeout(hintDelayTimer);
       window.clearTimeout(impactTimer);
       window.clearTimeout(cleanupTimer);
+      window.clearTimeout(hintHideTimer);
       pawGuide?.classList.remove('is-tapping');
       tapHint?.classList.remove('is-visible');
       stack
@@ -132,13 +142,22 @@ export function attachMotion(
         ?.classList.remove('is-booped');
     };
 
+    const showTapHint = () => {
+      if (!tapHint) return;
+      tapHint.classList.add('is-visible');
+      window.clearTimeout(hintHideTimer);
+      hintHideTimer = window.setTimeout(() => {
+        tapHint.classList.remove('is-visible');
+      }, TAP_HINT_VISIBLE_MS);
+    };
+
     // After a few seconds of idle viewing, send a lynx paw in to tap the photo
-    // and reveal a gentle text hint guiding visitors that the Polaroid is clickable.
+    // and reveal a gentle speech bubble guiding visitors that the Polaroid is clickable.
     hintDelayTimer = window.setTimeout(() => {
       if (hasInteracted) return;
 
       if (prefersReducedMotion || !pawGuide) {
-        tapHint?.classList.add('is-visible');
+        showTapHint();
         return;
       }
 
@@ -151,7 +170,7 @@ export function attachMotion(
           topCard.classList.add('is-booped');
           window.setTimeout(() => topCard.classList.remove('is-booped'), 360);
         }
-        tapHint?.classList.add('is-visible');
+        showTapHint();
       }, PAW_TAP_IMPACT_MS);
 
       cleanupTimer = window.setTimeout(() => {
@@ -159,8 +178,47 @@ export function attachMotion(
       }, PAW_TAP_DURATION_MS);
     }, PAW_HINT_DELAY_MS);
 
-    const dropNextPolaroid = () => {
-      dismissHint();
+    let autoAdvanceTimer: number | undefined;
+    let isHovered = false;
+    let isFocused = false;
+    let isUserPaused = prefersReducedMotion;
+
+    const syncPauseButton = () => {
+      if (!toggleBtn) return;
+      toggleBtn.classList.toggle('is-paused', isUserPaused);
+      toggleBtn.setAttribute('aria-pressed', String(isUserPaused));
+      toggleBtn.setAttribute(
+        'aria-label',
+        isUserPaused ? 'Resume photo slideshow' : 'Pause photo slideshow',
+      );
+      if (toggleLabel) {
+        toggleLabel.textContent = isUserPaused
+          ? 'resume slideshow'
+          : 'pause slideshow';
+      }
+    };
+
+    const scheduleAutoAdvance = () => {
+      window.clearTimeout(autoAdvanceTimer);
+      if (
+        isUserPaused ||
+        rotator.size <= 1 ||
+        isHovered ||
+        isFocused ||
+        document.visibilityState === 'hidden'
+      ) {
+        return;
+      }
+
+      autoAdvanceTimer = window.setTimeout(() => {
+        dropNextPolaroid(false);
+      }, AUTO_ADVANCE_MS);
+    };
+
+    const dropNextPolaroid = (fromUser = true) => {
+      if (fromUser) {
+        dismissHint();
+      }
 
       const nextPhoto = rotator.next();
       const placement = nextPolaroidPlacement(lastAngle);
@@ -183,6 +241,8 @@ export function attachMotion(
       while (stack.children.length > MAX_STACK_SIZE) {
         stack.firstElementChild?.remove();
       }
+
+      scheduleAutoAdvance();
     };
 
     stack.addEventListener('click', (event: MouseEvent) => {
@@ -190,8 +250,60 @@ export function attachMotion(
       if (!target) return;
       // Allow Polaroid footer links ("Photo credit" / "View post") to open normally
       if (target.closest('a')) return;
-      dropNextPolaroid();
+      dropNextPolaroid(true);
     });
+
+    if (rotator.size <= 1) {
+      if (toggleBtn) toggleBtn.hidden = true;
+    } else {
+      syncPauseButton();
+
+      toggleBtn?.addEventListener('click', () => {
+        isUserPaused = !isUserPaused;
+        syncPauseButton();
+        if (isUserPaused) {
+          window.clearTimeout(autoAdvanceTimer);
+        } else {
+          scheduleAutoAdvance();
+        }
+      });
+
+      stack.addEventListener('pointerenter', (event: PointerEvent) => {
+        if (event.pointerType !== 'mouse') return;
+        isHovered = true;
+        window.clearTimeout(autoAdvanceTimer);
+      });
+
+      stack.addEventListener('pointerleave', (event: PointerEvent) => {
+        if (event.pointerType !== 'mouse') return;
+        isHovered = false;
+        scheduleAutoAdvance();
+      });
+
+      stack.addEventListener('focusin', () => {
+        isFocused = true;
+        window.clearTimeout(autoAdvanceTimer);
+      });
+
+      stack.addEventListener('focusout', (event: FocusEvent) => {
+        isFocused =
+          event.relatedTarget instanceof Node &&
+          stack.contains(event.relatedTarget);
+        if (!isFocused) {
+          scheduleAutoAdvance();
+        }
+      });
+
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'hidden') {
+          window.clearTimeout(autoAdvanceTimer);
+        } else {
+          scheduleAutoAdvance();
+        }
+      });
+
+      scheduleAutoAdvance();
+    }
 
     if (!prefersReducedMotion && hasFinePointer) {
       let targetX = 0;

@@ -81,6 +81,13 @@ export const UI_ICONS = {
     <ellipse cx="38.8" cy="16.2" rx="5.4" ry="8.4" transform="rotate(7 38.8 16.2)"/>
     <ellipse cx="50.5" cy="27.5" rx="5.4" ry="8" transform="rotate(22 50.5 27.5)"/>
   </svg>`,
+  pause: `<svg viewBox="0 0 16 16" aria-hidden="true" fill="currentColor">
+    <rect x="3.5" y="2.8" width="3" height="10.4" rx="1"/>
+    <rect x="9.5" y="2.8" width="3" height="10.4" rx="1"/>
+  </svg>`,
+  play: `<svg viewBox="0 0 16 16" aria-hidden="true" fill="currentColor">
+    <path d="M4.6 2.9a.75.75 0 0 1 1.13-.64l7.6 4.6a.75.75 0 0 1 0 1.28l-7.6 4.6a.75.75 0 0 1-1.13-.64V2.9Z"/>
+  </svg>`,
 };
 
 export function getPlatformIcon(platform) {
@@ -193,5 +200,5 @@ export function renderSiteHtml(content, initialPhoto, initialPlacement) {
     })
     .join('');
 
-  return `<div class="photobooth-stage"><div class="ambient-backdrop" aria-hidden="true"><span class="ambient-orb ambient-orb--warm"></span><span class="ambient-orb ambient-orb--maroon"></span><span class="film-grain"></span></div><main class="booth-card" aria-label="${escapeHtml(`${content.profile.name} profile card`)}"><div class="booth-grid"><section class="photo-column" aria-label="Photos"><div class="polaroid-stage-wrap"><div class="polaroid-stack">${polaroidHtml}</div><div class="paw-guide" aria-hidden="true"><span class="paw-guide__ripple"></span><span class="paw-guide__paw">${UI_ICONS.lynxPaw}</span></div></div><p class="tap-hint" aria-live="polite"><span class="tap-hint__icon">${UI_ICONS.miniPaw}</span><span class="tap-hint__text">Tap photo for more</span></p></section><section class="info-column"><header class="profile-header"><h1 class="profile-name">${escapeHtml(content.profile.name)}</h1><p class="profile-bio">${escapeHtml(resolvedBio)}</p></header><nav class="links-nav" aria-label="Social links"><ul class="links-list">${linksHtml}</ul></nav></section></div></main></div>`;
+  return `<div class="photobooth-stage"><div class="ambient-backdrop" aria-hidden="true"><span class="ambient-orb ambient-orb--warm"></span><span class="ambient-orb ambient-orb--maroon"></span><span class="film-grain"></span></div><main class="booth-card" aria-label="${escapeHtml(`${content.profile.name} profile card`)}"><div class="booth-grid"><section class="photo-column" aria-label="Photos"><div class="polaroid-stage-wrap"><div class="polaroid-stack">${polaroidHtml}</div><div class="paw-guide" aria-hidden="true"><span class="paw-guide__ripple"></span><span class="paw-guide__paw">${UI_ICONS.lynxPaw}</span></div><p class="tap-hint" aria-live="polite"><span class="tap-hint__icon">${UI_ICONS.miniPaw}</span><span class="tap-hint__text">Tap for more!</span></p></div><div class="photo-controls"><button class="slideshow-toggle" type="button" aria-pressed="false" aria-label="Pause photo slideshow"><span class="slideshow-toggle__icon slideshow-toggle__icon--pause">${UI_ICONS.pause}</span><span class="slideshow-toggle__icon slideshow-toggle__icon--play">${UI_ICONS.play}</span><span class="slideshow-toggle__label">pause slideshow</span></button></div></section><section class="info-column"><header class="profile-header"><h1 class="profile-name">${escapeHtml(content.profile.name)}</h1><p class="profile-bio">${escapeHtml(resolvedBio)}</p></header><nav class="links-nav" aria-label="Social links"><ul class="links-list">${linksHtml}</ul></nav></section></div></main></div>`;
 }

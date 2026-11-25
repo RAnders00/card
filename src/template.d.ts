@@ -19,6 +19,8 @@ export const UI_ICONS: {
   check: string;
   miniPaw: string;
   lynxPaw: string;
+  pause: string;
+  play: string;
 };
 
 export function getPlatformIcon(platform: string): string;
