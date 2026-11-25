@@ -116,6 +116,8 @@ export function attachMotion(
   const tapHintText = root.querySelector<HTMLElement>('.tap-hint__text');
   const toggleBtn = root.querySelector<HTMLButtonElement>('.slideshow-toggle');
   const toggleLabel = root.querySelector<HTMLElement>('.slideshow-toggle__label');
+  const ringSvg = toggleBtn?.querySelector<SVGSVGElement>('.slideshow-toggle__ring');
+  const ringRects = ringSvg?.querySelectorAll<SVGRectElement>('rect');
 
   if (tapHintText && hasFinePointer) {
     tapHintText.textContent = 'Click for more!';
@@ -179,9 +181,40 @@ export function attachMotion(
     }, PAW_HINT_DELAY_MS);
 
     let autoAdvanceTimer: number | undefined;
+    let remainingMs = AUTO_ADVANCE_MS;
+    let timerStartedAt: number | null = null;
     let isHovered = false;
     let isFocused = false;
     let isUserPaused = prefersReducedMotion;
+
+    const isSlideshowHeld = () =>
+      isUserPaused ||
+      isHovered ||
+      isFocused ||
+      document.visibilityState === 'hidden';
+
+    const syncRingGeometry = () => {
+      if (!toggleBtn || !ringSvg || !ringRects || ringRects.length === 0) return;
+      const { width, height } = toggleBtn.getBoundingClientRect();
+      if (width < 4 || height < 4) return;
+
+      const rw = Math.max(1, width - 1);
+      const rh = Math.max(1, height - 1);
+      const radius = rh / 2;
+
+      ringSvg.setAttribute(
+        'viewBox',
+        `0 0 ${width.toFixed(1)} ${height.toFixed(1)}`,
+      );
+      ringRects.forEach((rect) => {
+        rect.setAttribute('x', '0.5');
+        rect.setAttribute('y', '0.5');
+        rect.setAttribute('width', rw.toFixed(1));
+        rect.setAttribute('height', rh.toFixed(1));
+        rect.setAttribute('rx', radius.toFixed(1));
+        rect.setAttribute('ry', radius.toFixed(1));
+      });
+    };
 
     const syncPauseButton = () => {
       if (!toggleBtn) return;
@@ -196,23 +229,44 @@ export function attachMotion(
           ? 'resume slideshow'
           : 'pause slideshow';
       }
+      syncRingGeometry();
     };
 
-    const scheduleAutoAdvance = () => {
+    const pauseSlideshowTimer = () => {
+      if (timerStartedAt !== null) {
+        remainingMs = Math.max(0, remainingMs - (performance.now() - timerStartedAt));
+        timerStartedAt = null;
+      }
       window.clearTimeout(autoAdvanceTimer);
-      if (
-        isUserPaused ||
-        rotator.size <= 1 ||
-        isHovered ||
-        isFocused ||
-        document.visibilityState === 'hidden'
-      ) {
+      toggleBtn?.classList.add('is-holding');
+    };
+
+    const resumeSlideshowTimer = () => {
+      window.clearTimeout(autoAdvanceTimer);
+      if (rotator.size <= 1 || isSlideshowHeld()) {
+        toggleBtn?.classList.add('is-holding');
         return;
       }
 
+      toggleBtn?.classList.remove('is-holding');
+      timerStartedAt = performance.now();
       autoAdvanceTimer = window.setTimeout(() => {
         dropNextPolaroid(false);
-      }, AUTO_ADVANCE_MS);
+      }, Math.max(50, remainingMs));
+    };
+
+    const resetSlideshowCycle = () => {
+      window.clearTimeout(autoAdvanceTimer);
+      remainingMs = AUTO_ADVANCE_MS;
+      timerStartedAt = null;
+
+      if (toggleBtn) {
+        toggleBtn.classList.remove('is-running');
+        void toggleBtn.offsetWidth;
+        toggleBtn.classList.add('is-running');
+      }
+
+      resumeSlideshowTimer();
     };
 
     const dropNextPolaroid = (fromUser = true) => {
@@ -242,7 +296,7 @@ export function attachMotion(
         stack.firstElementChild?.remove();
       }
 
-      scheduleAutoAdvance();
+      resetSlideshowCycle();
     };
 
     stack.addEventListener('click', (event: MouseEvent) => {
@@ -256,33 +310,43 @@ export function attachMotion(
     if (rotator.size <= 1) {
       if (toggleBtn) toggleBtn.hidden = true;
     } else {
+      toggleBtn?.style.setProperty('--slide-duration', `${AUTO_ADVANCE_MS}ms`);
       syncPauseButton();
+
+      document.fonts?.ready.then(() => {
+        syncRingGeometry();
+      });
+
+      if (toggleBtn && typeof ResizeObserver !== 'undefined') {
+        const ro = new ResizeObserver(() => syncRingGeometry());
+        ro.observe(toggleBtn);
+      }
 
       toggleBtn?.addEventListener('click', () => {
         isUserPaused = !isUserPaused;
         syncPauseButton();
         if (isUserPaused) {
-          window.clearTimeout(autoAdvanceTimer);
+          pauseSlideshowTimer();
         } else {
-          scheduleAutoAdvance();
+          resumeSlideshowTimer();
         }
       });
 
       stack.addEventListener('pointerenter', (event: PointerEvent) => {
         if (event.pointerType !== 'mouse') return;
         isHovered = true;
-        window.clearTimeout(autoAdvanceTimer);
+        pauseSlideshowTimer();
       });
 
       stack.addEventListener('pointerleave', (event: PointerEvent) => {
         if (event.pointerType !== 'mouse') return;
         isHovered = false;
-        scheduleAutoAdvance();
+        resumeSlideshowTimer();
       });
 
       stack.addEventListener('focusin', () => {
         isFocused = true;
-        window.clearTimeout(autoAdvanceTimer);
+        pauseSlideshowTimer();
       });
 
       stack.addEventListener('focusout', (event: FocusEvent) => {
@@ -290,19 +354,19 @@ export function attachMotion(
           event.relatedTarget instanceof Node &&
           stack.contains(event.relatedTarget);
         if (!isFocused) {
-          scheduleAutoAdvance();
+          resumeSlideshowTimer();
         }
       });
 
       document.addEventListener('visibilitychange', () => {
         if (document.visibilityState === 'hidden') {
-          window.clearTimeout(autoAdvanceTimer);
+          pauseSlideshowTimer();
         } else {
-          scheduleAutoAdvance();
+          resumeSlideshowTimer();
         }
       });
 
-      scheduleAutoAdvance();
+      resetSlideshowCycle();
     }
 
     if (!prefersReducedMotion && hasFinePointer) {
