@@ -17,6 +17,7 @@ export interface SiteContent {
   meta: {
     title: string;
     url: string;
+    repo?: string;
   };
   profile: {
     name: string;

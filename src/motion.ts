@@ -126,7 +126,7 @@ export function attachMotion(
   const toggleBtn = root.querySelector<HTMLButtonElement>('.slideshow-toggle');
   const toggleLabel = root.querySelector<HTMLElement>('.slideshow-toggle__label');
   const ringSvg = toggleBtn?.querySelector<SVGSVGElement>('.slideshow-toggle__ring');
-  const ringRects = ringSvg?.querySelectorAll<SVGRectElement>('rect');
+  const ringPaths = ringSvg?.querySelectorAll<SVGPathElement>('path');
 
   if (tapHintText && hasFinePointer) {
     tapHintText.textContent = 'Click for more!';
@@ -222,25 +222,26 @@ export function attachMotion(
     };
 
     const syncRingGeometry = () => {
-      if (!toggleBtn || !ringSvg || !ringRects || ringRects.length === 0) return;
+      if (!toggleBtn || !ringSvg || !ringPaths || ringPaths.length === 0) return;
       const { width, height } = toggleBtn.getBoundingClientRect();
       if (width < 4 || height < 4) return;
 
-      const rw = Math.max(1, width - 1);
-      const rh = Math.max(1, height - 1);
-      const radius = rh / 2;
+      const top = 0.5;
+      const bottom = height - 0.5;
+      const left = 0.5;
+      const right = width - 0.5;
+      const radius = Math.min((bottom - top) / 2, (right - left) / 2);
+      const cx = width / 2;
+      const x0 = left + radius;
+      const x1 = right - radius;
+      const d = `M ${cx.toFixed(2)} ${top} H ${x1.toFixed(2)} A ${radius.toFixed(2)} ${radius.toFixed(2)} 0 0 1 ${x1.toFixed(2)} ${bottom.toFixed(2)} H ${x0.toFixed(2)} A ${radius.toFixed(2)} ${radius.toFixed(2)} 0 0 1 ${x0.toFixed(2)} ${top} Z`;
 
       ringSvg.setAttribute(
         'viewBox',
         `0 0 ${width.toFixed(1)} ${height.toFixed(1)}`,
       );
-      ringRects.forEach((rect) => {
-        rect.setAttribute('x', '0.5');
-        rect.setAttribute('y', '0.5');
-        rect.setAttribute('width', rw.toFixed(1));
-        rect.setAttribute('height', rh.toFixed(1));
-        rect.setAttribute('rx', radius.toFixed(1));
-        rect.setAttribute('ry', radius.toFixed(1));
+      ringPaths.forEach((path) => {
+        path.setAttribute('d', d);
       });
     };
 

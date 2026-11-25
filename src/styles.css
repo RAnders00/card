@@ -117,7 +117,7 @@ body {
   z-index: 1;
   width: 100%;
   max-width: 860px;
-  margin: auto;
+  margin: auto auto 0;
   padding: clamp(1.4rem, 3.2vw, 2.5rem);
   border-radius: 28px;
   transition:
@@ -894,6 +894,59 @@ body {
   transform: scale(1);
 }
 
+/* Footer (Just Below Card on Desktop, Bottom of Page on Mobile) */
+.site-footer {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin: 0.85rem auto auto;
+}
+
+.github-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.36rem;
+  padding: 0.28rem 0.68rem;
+  border-radius: 999px;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.02em;
+  color: var(--ink-subtle);
+  text-decoration: none;
+  opacity: 0.78;
+  transition:
+    background-color 0.22s ease,
+    color 0.22s ease,
+    opacity 0.22s ease;
+}
+
+.github-link:hover {
+  opacity: 1;
+  background: rgba(84, 19, 32, 0.06);
+  color: var(--maroon-800);
+}
+
+.github-link:focus-visible {
+  outline: 2.5px solid var(--maroon-800);
+  outline-offset: 2px;
+}
+
+.github-link__icon {
+  display: inline-flex;
+  width: 12px;
+  height: 12px;
+  color: currentColor;
+}
+
+.github-link__icon svg {
+  width: 100%;
+  height: 100%;
+}
+
 /* Theme Toggle (Fixed Outside Card on Desktop, Bottom on Mobile) */
 .theme-toggle {
   position: fixed;
@@ -1260,9 +1313,15 @@ body {
   background: rgba(239, 193, 110, 0.2);
 }
 
+:root[data-theme='dark'] .github-link:hover {
+  background: rgba(246, 235, 208, 0.08);
+  color: #faf0d7;
+}
+
 :root[data-theme='dark'] .polaroid-photo-btn:focus-visible,
 :root[data-theme='dark'] .slideshow-toggle:focus-visible,
 :root[data-theme='dark'] .theme-toggle:focus-visible,
+:root[data-theme='dark'] .github-link:focus-visible,
 :root[data-theme='dark'] .link-anchor:focus-visible,
 :root[data-theme='dark'] .copy-btn:focus-visible {
   outline-color: var(--amber-300);
@@ -1272,13 +1331,18 @@ body {
 @media (max-width: 780px) {
   .booth-card {
     max-width: 470px;
-    margin: auto auto 0;
+    margin: auto;
     border-radius: 24px;
+  }
+
+  .site-footer {
+    margin: 0 auto;
+    padding-top: 1.25rem;
   }
 
   .theme-toggle {
     position: static;
-    margin: 1.25rem auto auto;
+    margin: 0;
   }
 
   .booth-grid {

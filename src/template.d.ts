@@ -23,6 +23,7 @@ export const UI_ICONS: {
   play: string;
   moon: string;
   sun: string;
+  github: string;
 };
 
 export function getPlatformIcon(platform: string): string;
