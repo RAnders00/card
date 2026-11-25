@@ -144,7 +144,10 @@ export function renderPolaroidCardHtml(photo, placement, isInitial = false) {
   const cardClass = isInitial
     ? 'polaroid-card is-top'
     : 'polaroid-card is-top is-dropping';
+  const photoRatio =
+    photo.width && photo.height ? photo.width / photo.height : 1;
   const styleAttr = [
+    `--photo-ratio: ${photoRatio.toFixed(4)}`,
     `--card-rotate: ${placement.rotateDeg.toFixed(2)}deg`,
     `--card-tx: ${placement.offsetX.toFixed(1)}px`,
     `--card-ty: ${placement.offsetY.toFixed(1)}px`,

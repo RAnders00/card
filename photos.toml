@@ -9,17 +9,43 @@ url = "https://linktr.ee/Isukan" # Add photographer profile/website URL to turn 
 name = "MabsFloof"
 url = "https://x.com/MabsFloof"
 
+[photographers.jikofox]
+name = "JikoFox"
+url = "https://jikofox.de/"
+
+[photographers.yong]
+name = "Yong"
+url = "https://x.com/pawmeier"
+
 # Photos included in the Polaroid stack rotation.
 # Store image files inside the photos/ directory and reference their filename below.
 
 [[photos]]
-file = "headshot.jpg"
+file = "10_isukan_grainywithglorp.jpg"
 alt = "randers the lynx fursuiter wearing a flower crown and holding a plush alien"
 photographer = "isukan"
 source = "https://www.furtrack.com/p/2217584" # Optional post URL; when set, shows a right-aligned "View post" link
 
 [[photos]]
-file = "headshot2.jpg"
+file = "20_mabs_partylookingsubmissive.jpg"
 alt = "Close-up of randers the lynx fursuiter wearing a flower crown under pink and blue lighting"
 photographer = "mabs"
 source = "https://www.furtrack.com/p/2196017"
+
+[[photos]]
+file = "30_jikofox_ef2026parade.jpg"
+alt = "randers the lynx at Eurofurence 2026 parade waving his paw"
+photographer = "jikofox"
+source = "https://www.furtrack.com/p/2242829"
+
+[[photos]]
+file = "40_mabs_mansplaining.jpg"
+alt = "randers the lynx at Eurofurence 2026 talking to another man with pink hair, it looks like mansplaining and \"uhm ackshually\""
+photographer = "mabs"
+source = "https://www.furtrack.com/p/2196012"
+
+[[photos]]
+file = "50_yong_party.jpg"
+alt = "randers the lynx at Eurofurence 2026 partying with arm warmers holding the paws up to the camera, kinda blurry"
+photographer = "yong"
+source = "https://www.furtrack.com/p/2195935"

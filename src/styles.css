@@ -165,9 +165,12 @@ body {
 }
 
 .polaroid-stage-wrap {
+  --photo-max-w: 286px;
+  --photo-max-h: 304px;
+
   position: relative;
   width: 100%;
-  max-width: 312px;
+  max-width: calc(var(--photo-max-w) + 26px);
 }
 
 .polaroid-stack {
@@ -177,7 +180,10 @@ body {
   --sheen-y: 50%;
 
   position: relative;
+  display: grid;
+  place-items: center;
   width: 100%;
+  min-height: calc(var(--photo-max-h) + 74px);
   transform-style: preserve-3d;
   transform: rotateX(var(--tilt-x)) rotateY(var(--tilt-y));
 }
@@ -270,14 +276,17 @@ body {
 }
 
 .polaroid-card {
+  --photo-ratio: 1;
   --card-rotate: -1.5deg;
   --card-tx: 0px;
   --card-ty: 0px;
   --drop-spin: 8deg;
   --drop-x: 0px;
 
+  grid-area: 1 / 1;
+  position: relative;
   margin: 0;
-  width: 100%;
+  width: calc(min(var(--photo-max-w), calc(var(--photo-max-h) * var(--photo-ratio))) + 26px);
   padding: 13px 13px 12px;
   border-radius: 4px;
   background: linear-gradient(178deg, #fffefb 0%, #fbf5e7 100%);
@@ -307,8 +316,6 @@ body {
 }
 
 .polaroid-card.is-buried {
-  position: absolute;
-  inset: 0;
   z-index: 1;
   pointer-events: none;
   box-shadow:
@@ -344,7 +351,7 @@ body {
 .polaroid-viewport {
   position: relative;
   display: block;
-  aspect-ratio: 1 / 1;
+  aspect-ratio: var(--photo-ratio, 1);
   overflow: hidden;
   border-radius: 2px;
   background: var(--maroon-950);
@@ -362,7 +369,6 @@ body {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center 20%;
 }
 
 .polaroid-sheen {
@@ -769,7 +775,8 @@ body {
   }
 
   .polaroid-stage-wrap {
-    max-width: 280px;
+    --photo-max-w: 254px;
+    --photo-max-h: 274px;
   }
 
   .profile-header {

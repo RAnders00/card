@@ -1,12 +1,61 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <rect width="64" height="64" rx="16" fill="#541320" />
+  <!-- Pointed charcoal cat ears with clean lynx tufts -->
   <path
-    d="M14 44 L17 17 L28 28 Q32 27 36 28 L47 17 L50 44 Q42 51 32 51 Q22 51 14 44 Z"
-    fill="#F4E6C3"
+    d="M13 32 L11 11 L27 20 Z"
+    fill="#5C5961"
+    stroke="#242327"
+    stroke-width="2.6"
+    stroke-linejoin="round"
   />
-  <path d="M19 23 L25 29 L20 33 Z" fill="#D98A2B" />
-  <path d="M45 23 L39 29 L44 33 Z" fill="#D98A2B" />
-  <circle cx="26" cy="36" r="2.6" fill="#541320" />
-  <circle cx="38" cy="36" r="2.6" fill="#541320" />
-  <path d="M29.5 41.5 L34.5 41.5 L32 44.5 Z" fill="#D98A2B" />
+  <path
+    d="M51 32 L53 11 L37 20 Z"
+    fill="#5C5961"
+    stroke="#242327"
+    stroke-width="2.6"
+    stroke-linejoin="round"
+  />
+
+  <!-- Lynx ear-tip tufts -->
+  <path
+    d="M11 12 L7.5 4.5 Q12 5.5 14 11 Z"
+    fill="#242327"
+    stroke="#242327"
+    stroke-width="1.6"
+    stroke-linejoin="round"
+  />
+  <path
+    d="M53 12 L56.5 4.5 Q52 5.5 50 11 Z"
+    fill="#242327"
+    stroke="#242327"
+    stroke-width="1.6"
+    stroke-linejoin="round"
+  />
+
+  <!-- Warm amber inner-ear triangles -->
+  <path d="M15.5 26 L14 16 L22.5 21 Z" fill="#DC8B22" />
+  <path d="M48.5 26 L50 16 L41.5 21 Z" fill="#DC8B22" />
+
+  <!-- Simple snow-white cat head with subtle cheek tufts -->
+  <path
+    d="M13 32 C14 21 22 18 32 18 C42 18 50 21 51 32 C56 35 58 41 54 45 C52 46 50.5 46 49.5 45.5 C47 53 40 57 32 57 C24 57 17 53 14.5 45.5 C13.5 46 12 46 10 45 C6 41 8 35 13 32 Z"
+    fill="#F4F5F7"
+    stroke="#242327"
+    stroke-width="2.6"
+    stroke-linejoin="round"
+  />
+
+  <!-- Subtle grey cheek markings -->
+  <path d="M11.5 34 Q16 33.5 19.5 36.5 L17.5 39.5 Q13.5 38.5 9.5 38 Z" fill="#5C5961" />
+  <path d="M52.5 34 Q48 33.5 44.5 36.5 L46.5 39.5 Q50.5 38.5 54.5 38 Z" fill="#5C5961" />
+
+  <!-- Simple amber cat eyes -->
+  <ellipse cx="23.5" cy="37" rx="3.8" ry="4.6" fill="#E39224" />
+  <ellipse cx="23.5" cy="37" rx="1.7" ry="2.7" fill="#242327" />
+
+  <ellipse cx="40.5" cy="37" rx="3.8" ry="4.6" fill="#E39224" />
+  <ellipse cx="40.5" cy="37" rx="1.7" ry="2.7" fill="#242327" />
+
+  <!-- Golden-ochre nose & tiny cat smile -->
+  <path d="M27.8 44.5 Q32 43 36.2 44.5 L32 49.2 Z" fill="#C47D18" />
+  <path d="M27.5 51.2 Q30 53.2 32 50.8 Q34 53.2 36.5 51.2" fill="none" stroke="#242327" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
 </svg>
