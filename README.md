@@ -7,7 +7,7 @@ Minimal, single-page Carrd-style site for **randers** deployed to GitHub Pages a
 Site copy and social links live separately from rendering code in [`content.toml`](./content.toml) and [`bio.md`](./bio.md):
 
 - `[meta]`: page title and canonical URL
-- `[profile]` in `content.toml`: display `name` and optional ISO 8601 `birthday` (`YYYY-MM-DD`, substitutes `{age}` in the bio)
+- `[profile]` in `content.toml`: display `name`, optional `pronouns`, and optional ISO 8601 `birthday` (`YYYY-MM-DD`, substitutes `{age}` in the bio)
 - [`bio.md`](./bio.md): profile bio with multiline Markdown, inline formatting, links (`[label](url)`, `<https://...>`, and bare `https://...` URLs), lists, blockquotes, and `{age}` substitution (its first paragraph is stripped to plain text for SEO/OpenGraph descriptions)
 - `[[links]]`: list of platform links (`x`, `bluesky`, `furtrack`, `instagram`, `telegram`, or any custom platform)
 

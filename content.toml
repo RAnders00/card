@@ -8,6 +8,7 @@ url = "https://randers.me"
 
 [profile]
 name = "randers"
+pronouns = "he/him"
 # Optional ISO 8601 date of birth (YYYY-MM-DD) used to substitute {age} in bio.md
 # Bio content (supports multiline Markdown, links, and {age}) lives in bio.md
 birthday = 2000-03-31

@@ -20,6 +20,7 @@ export interface SiteContent {
   };
   profile: {
     name: string;
+    pronouns?: string;
     birthday?: string;
     bio?: string;
   };
