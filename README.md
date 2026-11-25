@@ -30,7 +30,7 @@ npm run dev
 npm run build
 ```
 
-Static output is generated in `dist/` (including `CNAME` and the preview photo).
+Static output is generated in `dist/` (including the preview photo).
 
 ## GitHub Pages Deployment
 
@@ -39,4 +39,4 @@ Pushes to `main` automatically build and deploy via [`.github/workflows/deploy.y
 In your GitHub repository settings:
 1. Go to **Settings -> Pages**.
 2. Under **Build and deployment**, set **Source** to **GitHub Actions**.
-3. Ensure your DNS for `randers.me` points to GitHub Pages (`CNAME` is already included in `public/CNAME`).
+3. Set **Custom domain** to `randers.me` and point your DNS for `randers.me` at GitHub Pages.
