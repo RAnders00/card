@@ -7,8 +7,8 @@ import { parse as parseToml } from 'smol-toml';
 import { defineConfig } from 'vite';
 import {
   escapeHtml,
-  formatBio,
   INITIAL_PLACEMENT,
+  renderBioPlainText,
   renderSiteHtml,
 } from './src/template.js';
 
@@ -21,6 +21,14 @@ const PHOTO_SIZES_ATTR = '(max-width: 780px) 254px, 286px';
 
 function readToml(relativePath) {
   return parseToml(readFileSync(resolve(rootDir, relativePath), 'utf8'));
+}
+
+function readBio(content) {
+  const bioPath = resolve(rootDir, 'bio.md');
+  if (existsSync(bioPath)) {
+    return readFileSync(bioPath, 'utf8');
+  }
+  return content.profile?.bio ?? '';
 }
 
 function normalizePhotoFile(file) {
@@ -262,7 +270,14 @@ function siteContentPlugin() {
     transformIndexHtml: {
       order: 'post',
       async handler(html, ctx) {
-        const content = readToml('content.toml');
+        const parsedContent = readToml('content.toml');
+        const content = {
+          ...parsedContent,
+          profile: {
+            ...parsedContent.profile,
+            bio: readBio(parsedContent),
+          },
+        };
         const photosConfig = readToml('photos.toml');
         const resolvedPhotos =
           isBuild && lastResolvedPhotos
@@ -270,7 +285,7 @@ function siteContentPlugin() {
             : await resolvePhotos(this);
 
         const title = content.meta.title;
-        const description = formatBio(
+        const description = renderBioPlainText(
           content.profile.bio,
           content.profile.birthday,
         );

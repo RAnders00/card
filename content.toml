@@ -8,9 +8,9 @@ url = "https://randers.me"
 
 [profile]
 name = "randers"
-# Optional ISO 8601 date of birth (YYYY-MM-DD) used to substitute {age} in bio
+# Optional ISO 8601 date of birth (YYYY-MM-DD) used to substitute {age} in bio.md
+# Bio content (supports multiline Markdown, links, and {age}) lives in bio.md
 birthday = 2000-03-31
-bio = "Lynx fursuiter based in Germany. {age} yo. I meow in English/German :3"
 
 # Social links rendered in order.
 # Built-in icons: "x", "bluesky", "furtrack", "instagram", "telegram"

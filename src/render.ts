@@ -1,6 +1,7 @@
 import {
-  formatBio,
   type PolaroidPlacement,
+  renderBioHtml,
+  renderBioPlainText,
   renderPolaroidCardHtml,
   renderSiteHtml,
 } from './template.js';
@@ -22,21 +23,23 @@ export function createPolaroidCard(
 }
 
 /**
- * Updates live document metadata and `{age}` bio text on pre-rendered HTML
- * without replacing existing DOM nodes.
+ * Updates live document metadata and `{age}` bio HTML on pre-rendered HTML
+ * without replacing unrelated DOM nodes.
  */
 export function hydrateSite(root: HTMLElement, content: SiteContent): void {
-  const resolvedBio = formatBio(content.profile.bio, content.profile.birthday);
+  const rawBio = content.profile.bio ?? '';
+  const resolvedBioText = renderBioPlainText(rawBio, content.profile.birthday);
+  const resolvedBioHtml = renderBioHtml(rawBio, content.profile.birthday);
 
   document.title = content.meta.title;
   const metaDesc = document.querySelector('meta[name="description"]');
   if (metaDesc) {
-    metaDesc.setAttribute('content', resolvedBio);
+    metaDesc.setAttribute('content', resolvedBioText);
   }
 
   const bioEl = root.querySelector<HTMLElement>('.profile-bio');
-  if (bioEl && bioEl.textContent !== resolvedBio) {
-    bioEl.textContent = resolvedBio;
+  if (bioEl && bioEl.innerHTML !== resolvedBioHtml) {
+    bioEl.innerHTML = resolvedBioHtml;
   }
 }
 
@@ -49,12 +52,15 @@ export function renderSite(
   initialPhoto: ResolvedPhoto,
   initialPlacement: PolaroidPlacement,
 ): void {
-  const resolvedBio = formatBio(content.profile.bio, content.profile.birthday);
+  const resolvedBioText = renderBioPlainText(
+    content.profile.bio ?? '',
+    content.profile.birthday,
+  );
 
   document.title = content.meta.title;
   const metaDesc = document.querySelector('meta[name="description"]');
   if (metaDesc) {
-    metaDesc.setAttribute('content', resolvedBio);
+    metaDesc.setAttribute('content', resolvedBioText);
   }
 
   root.innerHTML = renderSiteHtml(content, initialPhoto, initialPlacement);

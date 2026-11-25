@@ -151,6 +151,196 @@ export function formatBio(bio, birthday, now = new Date()) {
   return age === null ? bio : bio.replaceAll('{age}', String(age));
 }
 
+function isSafeUrl(url) {
+  const trimmed = url.trim();
+  return /^(https?:\/\/|mailto:|\/(?!\/)|\.\/|\.\.\/|#)/i.test(trimmed);
+}
+
+function buildAnchorHtml(url, labelHtml, title = '') {
+  const trimmed = url.trim();
+  if (!isSafeUrl(trimmed)) return labelHtml;
+
+  const isExternal = /^https?:\/\//i.test(trimmed);
+  const externalAttrs = isExternal
+    ? ' target="_blank" rel="noopener noreferrer"'
+    : '';
+  const titleAttr = title ? ` title="${escapeHtml(title)}"` : '';
+  const iconHtml = isExternal
+    ? `<span class="external-icon" aria-hidden="true">${UI_ICONS.externalTab}</span>`
+    : '';
+  return `<a href="${escapeHtml(trimmed)}"${externalAttrs}${titleAttr}>${labelHtml}${iconHtml}</a>`;
+}
+
+function applyEmphasis(escapedText) {
+  return escapedText
+    .replace(/\*\*([^\s*](?:.*?[^\s*])?)\*\*/g, '<strong>$1</strong>')
+    .replace(
+      /(^|[^\w])__([^\s_](?:.*?[^\s_])?)__(?=[^\w]|$)/g,
+      '$1<strong>$2</strong>',
+    )
+    .replace(/~~(.+?)~~/g, '<del>$1</del>')
+    .replace(/\*([^\s*](?:.*?[^\s*])?)\*/g, '<em>$1</em>')
+    .replace(
+      /(^|[^\w])_([^\s_](?:.*?[^\s_])?)_(?=[^\w]|$)/g,
+      '$1<em>$2</em>',
+    );
+}
+
+function restoreTokens(text, tokens) {
+  return text.replace(/\x00(\d+)\x00/g, (_, idx) => tokens[Number(idx)] ?? '');
+}
+
+function renderInlineMarkdown(raw) {
+  const tokens = [];
+  const stash = (html) => {
+    const id = tokens.length;
+    tokens.push(html);
+    return `\x00${id}\x00`;
+  };
+
+  let text = String(raw ?? '').replace(/\x00/g, '');
+
+  // Protect backslash escapes and inline code first
+  text = text.replace(/\\([\\`*_{}[\]()#+\-.!~|])/g, (_, ch) =>
+    stash(escapeHtml(ch)),
+  );
+  text = text.replace(/`([^`]+)`/g, (_, code) =>
+    stash(`<code>${escapeHtml(code)}</code>`),
+  );
+
+  // Markdown links: [label](url) or [label](url "title")
+  text = text.replace(
+    /\[([^\]]+)\]\(<?((?:[^()\s<>]|\([^()\s<>]*\))+)>?(?:\s+"([^"]*)")?\)/g,
+    (_, label, url, title = '') => {
+      const labelHtml = restoreTokens(applyEmphasis(escapeHtml(label)), tokens);
+      return stash(buildAnchorHtml(url, labelHtml, title));
+    },
+  );
+
+  // Angle-bracket autolinks: <https://...>
+  text = text.replace(/<(https?:\/\/[^\s>]+)>/g, (_, url) =>
+    stash(buildAnchorHtml(url, escapeHtml(url))),
+  );
+
+  // Bare URL autolinks (keeping trailing sentence punctuation outside <a>)
+  text = text.replace(/(^|[\s(])(https?:\/\/[^\s<>"'\x00]+)/g, (full, prefix, rawUrl) => {
+    let cleanUrl = rawUrl;
+    let trailing = '';
+
+    while (/[.,!?;:]$/.test(cleanUrl)) {
+      trailing = cleanUrl.slice(-1) + trailing;
+      cleanUrl = cleanUrl.slice(0, -1);
+    }
+    while (cleanUrl.endsWith(')')) {
+      const opens = (cleanUrl.match(/\(/g) ?? []).length;
+      const closes = (cleanUrl.match(/\)/g) ?? []).length;
+      if (closes > opens) {
+        trailing = `)${trailing}`;
+        cleanUrl = cleanUrl.slice(0, -1);
+      } else {
+        break;
+      }
+    }
+
+    if (!cleanUrl || !/^https?:\/\/\S/i.test(cleanUrl)) return full;
+    return `${prefix}${stash(buildAnchorHtml(cleanUrl, escapeHtml(cleanUrl)))}${trailing}`;
+  });
+
+  return restoreTokens(applyEmphasis(escapeHtml(text)), tokens);
+}
+
+function renderMarkdown(source) {
+  const lines = String(source ?? '')
+    .replace(/\r\n?/g, '\n')
+    .split('\n');
+  const blocks = [];
+  let i = 0;
+
+  while (i < lines.length) {
+    if (lines[i].trim() === '') {
+      i += 1;
+      continue;
+    }
+
+    if (/^\s*[-*+]\s+/.test(lines[i])) {
+      const items = [];
+      while (i < lines.length && /^\s*[-*+]\s+(.*)$/.test(lines[i])) {
+        const match = /^\s*[-*+]\s+(.*)$/.exec(lines[i]);
+        items.push(`<li>${renderInlineMarkdown(match[1])}</li>`);
+        i += 1;
+      }
+      blocks.push(`<ul>${items.join('')}</ul>`);
+      continue;
+    }
+
+    if (/^\s*\d+\.\s+/.test(lines[i])) {
+      const items = [];
+      while (i < lines.length && /^\s*\d+\.\s+(.*)$/.test(lines[i])) {
+        const match = /^\s*\d+\.\s+(.*)$/.exec(lines[i]);
+        items.push(`<li>${renderInlineMarkdown(match[1])}</li>`);
+        i += 1;
+      }
+      blocks.push(`<ol>${items.join('')}</ol>`);
+      continue;
+    }
+
+    if (/^\s*>\s?/.test(lines[i])) {
+      const quoteLines = [];
+      while (i < lines.length && /^\s*>\s?(.*)$/.test(lines[i])) {
+        const match = /^\s*>\s?(.*)$/.exec(lines[i]);
+        quoteLines.push(renderInlineMarkdown(match[1]));
+        i += 1;
+      }
+      blocks.push(`<blockquote><p>${quoteLines.join('<br>')}</p></blockquote>`);
+      continue;
+    }
+
+    const paraLines = [];
+    while (
+      i < lines.length &&
+      lines[i].trim() !== '' &&
+      !/^\s*(?:[-*+]|\d+\.)\s+/.test(lines[i]) &&
+      !/^\s*>\s?/.test(lines[i])
+    ) {
+      paraLines.push(renderInlineMarkdown(lines[i]));
+      i += 1;
+    }
+    blocks.push(`<p>${paraLines.join('<br>')}</p>`);
+  }
+
+  return blocks.join('');
+}
+
+/**
+ * Resolves `{age}` and renders the profile bio Markdown as HTML.
+ */
+export function renderBioHtml(bio, birthday, now = new Date()) {
+  return renderMarkdown(formatBio(bio ?? '', birthday, now));
+}
+
+/**
+ * Resolves `{age}` and strips Markdown syntax from the first paragraph for plain-text metadata tags.
+ */
+export function renderBioPlainText(bio, birthday, now = new Date()) {
+  const formatted = formatBio(bio ?? '', birthday, now);
+  const firstParagraph =
+    formatted.replace(/\r\n?/g, '\n').trim().split(/\n\s*\n/)[0] ?? '';
+  return firstParagraph
+    .replace(/^\s*>\s?/gm, '')
+    .replace(/^\s*(?:[-*+]|\d+\.)\s+/gm, '')
+    .replace(/\[([^\]]+)\]\(<?(?:[^()\s<>]|\([^()\s<>]*\))+>?(?:\s+"[^"]*")?\)/g, '$1')
+    .replace(/<(https?:\/\/[^\s>]+)>/g, '$1')
+    .replace(/`([^`]+)`/g, '$1')
+    .replace(/\\([\\`*_{}[\]()#+\-.!~|])/g, '$1')
+    .replace(/\*\*([^\s*](?:.*?[^\s*])?)\*\*/g, '$1')
+    .replace(/(^|[^\w])__([^\s_](?:.*?[^\s_])?)__(?=[^\w]|$)/g, '$1$2')
+    .replace(/~~(.+?)~~/g, '$1')
+    .replace(/\*([^\s*](?:.*?[^\s*])?)\*/g, '$1')
+    .replace(/(^|[^\w])_([^\s_](?:.*?[^\s_])?)_(?=[^\w]|$)/g, '$1$2')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
 /**
  * Renders a single Polaroid card as HTML for both build-time pre-rendering and runtime stack drops.
  */
@@ -195,7 +385,10 @@ export function renderPolaroidCardHtml(photo, placement, isInitial = false) {
  * Renders the full `#app` markup as HTML so dist/index.html ships complete static HTML.
  */
 export function renderSiteHtml(content, initialPhoto, initialPlacement) {
-  const resolvedBio = formatBio(content.profile.bio, content.profile.birthday);
+  const bioHtml = renderBioHtml(
+    content.profile.bio ?? '',
+    content.profile.birthday,
+  );
   const polaroidHtml = renderPolaroidCardHtml(initialPhoto, initialPlacement, true);
 
   const linksHtml = content.links
@@ -207,5 +400,5 @@ export function renderSiteHtml(content, initialPhoto, initialPlacement) {
     })
     .join('');
 
-  return `<div class="photobooth-stage"><div class="ambient-backdrop" aria-hidden="true"><span class="ambient-orb ambient-orb--warm"></span><span class="ambient-orb ambient-orb--maroon"></span><span class="film-grain"></span></div><main class="booth-card" aria-label="${escapeHtml(`${content.profile.name} profile card`)}"><div class="booth-grid"><section class="photo-column" aria-label="Photos"><div class="polaroid-stage-wrap"><div class="polaroid-stack">${polaroidHtml}</div><div class="paw-guide" aria-hidden="true"><span class="paw-guide__ripple"></span><span class="paw-guide__paw">${UI_ICONS.lynxPaw}</span></div><p class="tap-hint" aria-live="polite"><span class="tap-hint__icon">${UI_ICONS.miniPaw}</span><span class="tap-hint__text">Tap for more!</span></p></div><div class="photo-controls"><button class="slideshow-toggle" type="button" aria-pressed="false" aria-label="Pause photo slideshow"><svg class="slideshow-toggle__ring" aria-hidden="true" viewBox="0 0 130 24"><rect class="slideshow-toggle__track" x="0.5" y="0.5" width="129" height="23" rx="11.5" ry="11.5" pathLength="100"/><rect class="slideshow-toggle__progress" x="0.5" y="0.5" width="129" height="23" rx="11.5" ry="11.5" pathLength="100"/></svg><span class="slideshow-toggle__icon slideshow-toggle__icon--pause">${UI_ICONS.pause}</span><span class="slideshow-toggle__icon slideshow-toggle__icon--play">${UI_ICONS.play}</span><span class="slideshow-toggle__label">pause slideshow</span></button></div></section><section class="info-column"><header class="profile-header"><h1 class="profile-name">${escapeHtml(content.profile.name)}</h1><p class="profile-bio">${escapeHtml(resolvedBio)}</p></header><nav class="links-nav" aria-label="Social links"><ul class="links-list">${linksHtml}</ul></nav></section></div></main><button class="theme-toggle" type="button" aria-label="Switch to dark mode"><span class="theme-toggle__icon theme-toggle__icon--moon">${UI_ICONS.moon}</span><span class="theme-toggle__icon theme-toggle__icon--sun">${UI_ICONS.sun}</span><span class="theme-toggle__label">dark mode</span></button></div>`;
+  return `<div class="photobooth-stage"><div class="ambient-backdrop" aria-hidden="true"><span class="ambient-orb ambient-orb--warm"></span><span class="ambient-orb ambient-orb--maroon"></span><span class="film-grain"></span></div><main class="booth-card" aria-label="${escapeHtml(`${content.profile.name} profile card`)}"><div class="booth-grid"><section class="photo-column" aria-label="Photos"><div class="polaroid-stage-wrap"><div class="polaroid-stack">${polaroidHtml}</div><div class="paw-guide" aria-hidden="true"><span class="paw-guide__ripple"></span><span class="paw-guide__paw">${UI_ICONS.lynxPaw}</span></div><p class="tap-hint" aria-live="polite"><span class="tap-hint__icon">${UI_ICONS.miniPaw}</span><span class="tap-hint__text">Tap for more!</span></p></div><div class="photo-controls"><button class="slideshow-toggle" type="button" aria-pressed="false" aria-label="Pause photo slideshow"><svg class="slideshow-toggle__ring" aria-hidden="true" viewBox="0 0 130 24"><rect class="slideshow-toggle__track" x="0.5" y="0.5" width="129" height="23" rx="11.5" ry="11.5" pathLength="100"/><rect class="slideshow-toggle__progress" x="0.5" y="0.5" width="129" height="23" rx="11.5" ry="11.5" pathLength="100"/></svg><span class="slideshow-toggle__icon slideshow-toggle__icon--pause">${UI_ICONS.pause}</span><span class="slideshow-toggle__icon slideshow-toggle__icon--play">${UI_ICONS.play}</span><span class="slideshow-toggle__label">pause slideshow</span></button></div></section><section class="info-column"><header class="profile-header"><h1 class="profile-name">${escapeHtml(content.profile.name)}</h1><div class="profile-bio">${bioHtml}</div></header><nav class="links-nav" aria-label="Social links"><ul class="links-list">${linksHtml}</ul></nav></section></div></main><button class="theme-toggle" type="button" aria-label="Switch to dark mode"><span class="theme-toggle__icon theme-toggle__icon--moon">${UI_ICONS.moon}</span><span class="theme-toggle__icon theme-toggle__icon--sun">${UI_ICONS.sun}</span><span class="theme-toggle__label">dark mode</span></button></div>`;
 }

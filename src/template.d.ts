@@ -40,6 +40,18 @@ export function formatBio(
   now?: Date,
 ): string;
 
+export function renderBioHtml(
+  bio: string,
+  birthday?: string | Date,
+  now?: Date,
+): string;
+
+export function renderBioPlainText(
+  bio: string,
+  birthday?: string | Date,
+  now?: Date,
+): string;
+
 export function renderPolaroidCardHtml(
   photo: ResolvedPhoto,
   placement: PolaroidPlacement,

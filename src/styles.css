@@ -600,6 +600,83 @@ body {
   color: var(--ink-muted);
 }
 
+.profile-bio > :first-child {
+  margin-top: 0;
+}
+
+.profile-bio > :last-child {
+  margin-bottom: 0;
+}
+
+.profile-bio p {
+  margin: 0.55rem 0;
+}
+
+.profile-bio strong {
+  color: var(--ink-primary);
+  font-weight: 600;
+}
+
+.profile-bio a {
+  color: var(--maroon-800);
+  text-decoration: underline;
+  text-decoration-color: rgba(84, 19, 32, 0.35);
+  text-underline-offset: 2.5px;
+  transition:
+    color 0.2s ease,
+    text-decoration-color 0.2s ease;
+}
+
+.profile-bio a:hover {
+  color: var(--maroon-600);
+  text-decoration-color: currentColor;
+}
+
+.profile-bio a:focus-visible {
+  outline: 2px solid var(--maroon-800);
+  outline-offset: 2px;
+  border-radius: 3px;
+}
+
+.profile-bio .external-icon {
+  width: 0.8em;
+  height: 0.8em;
+  margin-left: 0.22em;
+  vertical-align: -0.09em;
+  opacity: 0.78;
+  transition: opacity 0.2s ease;
+}
+
+.profile-bio a:hover .external-icon {
+  opacity: 1;
+}
+
+.profile-bio code {
+  font-family: var(--font-mono);
+  font-size: 0.86em;
+  padding: 0.1em 0.34em;
+  border-radius: 5px;
+  background: rgba(84, 19, 32, 0.08);
+  color: var(--maroon-900);
+}
+
+.profile-bio ul,
+.profile-bio ol {
+  margin: 0.55rem 0;
+  padding-left: 1.25rem;
+}
+
+.profile-bio li + li {
+  margin-top: 0.22rem;
+}
+
+.profile-bio blockquote {
+  margin: 0.65rem 0;
+  padding-left: 0.78rem;
+  border-left: 2.5px solid rgba(84, 19, 32, 0.28);
+  color: var(--ink-subtle);
+}
+
 /* Carrd Link Stack */
 .links-list {
   display: flex;
@@ -999,6 +1076,32 @@ body {
   color: #fcf4df;
 }
 
+:root[data-theme='dark'] .profile-bio strong {
+  color: var(--ink-primary);
+}
+
+:root[data-theme='dark'] .profile-bio a {
+  color: var(--amber-300);
+  text-decoration-color: rgba(239, 193, 110, 0.42);
+}
+
+:root[data-theme='dark'] .profile-bio a:hover {
+  color: #fae0a8;
+}
+
+:root[data-theme='dark'] .profile-bio a:focus-visible {
+  outline-color: var(--amber-300);
+}
+
+:root[data-theme='dark'] .profile-bio code {
+  background: rgba(246, 235, 208, 0.1);
+  color: #faf0d7;
+}
+
+:root[data-theme='dark'] .profile-bio blockquote {
+  border-left-color: rgba(239, 193, 110, 0.36);
+}
+
 :root[data-theme='dark'] .polaroid-card {
   background: linear-gradient(178deg, #efe5ce 0%, #e4d5b6 100%);
   border-color: rgba(246, 235, 208, 0.2);
@@ -1174,6 +1277,12 @@ body {
 
   .profile-header {
     text-align: center;
+  }
+
+  .profile-bio ul,
+  .profile-bio ol {
+    display: inline-block;
+    text-align: left;
   }
 }
 

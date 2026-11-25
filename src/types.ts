@@ -21,7 +21,7 @@ export interface SiteContent {
   profile: {
     name: string;
     birthday?: string;
-    bio: string;
+    bio?: string;
   };
   links: LinkItem[];
 }
