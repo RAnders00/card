@@ -21,6 +21,8 @@ export const UI_ICONS: {
   lynxPaw: string;
   pause: string;
   play: string;
+  moon: string;
+  sun: string;
 };
 
 export function getPlatformIcon(platform: string): string;

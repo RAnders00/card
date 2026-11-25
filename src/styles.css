@@ -1,4 +1,6 @@
 :root {
+  color-scheme: light dark;
+
   /* Soft Sand / Photobooth Cream-Yellow Backdrop + Deep Maroon Ink */
   --sand-50: #fcf6e6;
   --sand-100: #f6ebd0;
@@ -799,6 +801,68 @@ body {
   transform: scale(1);
 }
 
+/* Theme Toggle (Fixed Outside Card on Desktop, Bottom on Mobile) */
+.theme-toggle {
+  position: fixed;
+  top: calc(1.1rem + env(safe-area-inset-top, 0px));
+  right: calc(1.25rem + env(safe-area-inset-right, 0px));
+  z-index: 10;
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.36rem;
+  padding: 0.28rem 0.68rem;
+  border-radius: 999px;
+  background: rgba(255, 251, 240, 0.55);
+  border: 1px solid rgba(84, 19, 32, 0.14);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.02em;
+  color: var(--ink-subtle);
+  cursor: pointer;
+  transition:
+    background-color 0.22s ease,
+    border-color 0.22s ease,
+    color 0.22s ease;
+}
+
+.theme-toggle:hover {
+  background: rgba(255, 252, 244, 0.88);
+  border-color: rgba(84, 19, 32, 0.28);
+  color: var(--maroon-800);
+}
+
+.theme-toggle:focus-visible {
+  outline: 2.5px solid var(--maroon-800);
+  outline-offset: 2px;
+}
+
+.theme-toggle__icon {
+  display: inline-flex;
+  width: 12px;
+  height: 12px;
+  color: currentColor;
+}
+
+.theme-toggle__icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.theme-toggle__icon--sun {
+  display: none;
+}
+
+:root[data-theme='dark'] .theme-toggle__icon--moon {
+  display: none;
+}
+
+:root[data-theme='dark'] .theme-toggle__icon--sun {
+  display: inline-flex;
+}
+
 /* Keyframes */
 @keyframes polaroid-drop {
   0% {
@@ -892,11 +956,210 @@ body {
   }
 }
 
+/* Dark Mode (Deep Maroon Darkroom + Warm Sand Accents) */
+:root[data-theme='dark'] {
+  --ink-primary: #faf0d7;
+  --ink-muted: rgba(246, 235, 208, 0.76);
+  --ink-subtle: rgba(246, 235, 208, 0.56);
+
+  --card-surface: rgba(46, 13, 22, 0.72);
+  --card-border: rgba(246, 235, 208, 0.13);
+  --shadow-maroon: rgba(8, 1, 3, 0.65);
+}
+
+:root[data-theme='dark'] body {
+  background-color: #21080e;
+}
+
+:root[data-theme='dark'] .ambient-backdrop {
+  background:
+    radial-gradient(circle at 18% 15%, rgba(122, 28, 48, 0.42) 0%, transparent 52%),
+    radial-gradient(circle at 82% 85%, rgba(217, 138, 43, 0.14) 0%, transparent 55%),
+    linear-gradient(155deg, #2d0b14 0%, #21080e 52%, #150409 100%);
+}
+
+:root[data-theme='dark'] .ambient-orb--warm {
+  opacity: 0.42;
+  background: radial-gradient(circle, rgba(217, 138, 43, 0.24), rgba(110, 26, 44, 0.1));
+}
+
+:root[data-theme='dark'] .ambient-orb--maroon {
+  opacity: 0.5;
+  background: radial-gradient(circle, rgba(135, 38, 58, 0.35), rgba(41, 7, 14, 0.18));
+}
+
+:root[data-theme='dark'] .booth-card::before {
+  box-shadow:
+    0 24px 60px -18px var(--shadow-maroon),
+    0 2px 10px -2px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(252, 246, 230, 0.08);
+}
+
+:root[data-theme='dark'] .profile-name {
+  color: #fcf4df;
+}
+
+:root[data-theme='dark'] .polaroid-card {
+  background: linear-gradient(178deg, #efe5ce 0%, #e4d5b6 100%);
+  border-color: rgba(246, 235, 208, 0.2);
+  box-shadow:
+    0 20px 38px -12px rgba(8, 1, 3, 0.55),
+    0 4px 12px rgba(8, 1, 3, 0.35);
+}
+
+:root[data-theme='dark'] .polaroid-card.is-top:hover {
+  border-color: rgba(239, 193, 110, 0.45);
+  box-shadow:
+    0 26px 46px -12px rgba(8, 1, 3, 0.65),
+    0 6px 16px rgba(217, 138, 43, 0.18);
+}
+
+:root[data-theme='dark'] .polaroid-card.is-buried {
+  box-shadow:
+    0 12px 24px -10px rgba(8, 1, 3, 0.48),
+    0 2px 8px rgba(8, 1, 3, 0.28);
+}
+
+:root[data-theme='dark'] .polaroid-caption {
+  color: rgba(61, 12, 23, 0.74);
+}
+
+:root[data-theme='dark'] .polaroid-credit__name {
+  color: #3d0c17;
+}
+
+:root[data-theme='dark'] .polaroid-link {
+  color: #541320;
+}
+
+:root[data-theme='dark'] .polaroid-link:hover {
+  color: #7a1e32;
+}
+
+:root[data-theme='dark'] .polaroid-link:focus-visible {
+  outline-color: #541320;
+}
+
+:root[data-theme='dark'] .tap-hint {
+  background: #38101b;
+  border-color: rgba(246, 235, 208, 0.24);
+  box-shadow: 0 12px 24px -8px rgba(8, 1, 3, 0.6);
+  color: #faf0d7;
+}
+
+:root[data-theme='dark'] .tap-hint::before {
+  background: #38101b;
+  border-top-color: rgba(246, 235, 208, 0.24);
+  border-left-color: rgba(246, 235, 208, 0.24);
+}
+
+:root[data-theme='dark'] .tap-hint__icon {
+  color: #efc16e;
+}
+
+:root[data-theme='dark'] .slideshow-toggle:hover {
+  background: rgba(246, 235, 208, 0.08);
+  color: #faf0d7;
+}
+
+:root[data-theme='dark'] .slideshow-toggle.is-paused {
+  color: #efc16e;
+}
+
+:root[data-theme='dark'] .slideshow-toggle__track {
+  stroke: rgba(246, 235, 208, 0.1);
+}
+
+:root[data-theme='dark'] .slideshow-toggle__progress {
+  stroke: rgba(239, 193, 110, 0.42);
+}
+
+:root[data-theme='dark'] .theme-toggle {
+  background: rgba(58, 16, 27, 0.68);
+  border-color: rgba(246, 235, 208, 0.14);
+}
+
+:root[data-theme='dark'] .theme-toggle:hover {
+  background: rgba(74, 21, 35, 0.9);
+  border-color: rgba(239, 193, 110, 0.3);
+  color: #faf0d7;
+}
+
+:root[data-theme='dark'] .link-item {
+  background: rgba(58, 16, 27, 0.74);
+  border-color: rgba(246, 235, 208, 0.12);
+  box-shadow: 0 4px 12px -4px rgba(8, 1, 3, 0.42);
+}
+
+:root[data-theme='dark'] .link-item::before {
+  background: radial-gradient(
+    220px circle at var(--mx) var(--my),
+    rgba(239, 193, 110, 0.16),
+    rgba(246, 235, 208, 0.05) 55%,
+    transparent 80%
+  );
+}
+
+:root[data-theme='dark'] .link-item:hover {
+  border-color: rgba(239, 193, 110, 0.3);
+  background: rgba(74, 21, 35, 0.92);
+  box-shadow: 0 14px 26px -10px rgba(8, 1, 3, 0.62);
+}
+
+:root[data-theme='dark'] .link-icon {
+  background: rgba(246, 235, 208, 0.13);
+  color: var(--sand-50);
+}
+
+:root[data-theme='dark'] .link-item:hover .link-icon {
+  background: var(--amber-500);
+  color: var(--maroon-950);
+}
+
+:root[data-theme='dark'] .link-label {
+  color: #faf0d7;
+}
+
+:root[data-theme='dark'] .link-item:hover .link-arrow {
+  color: var(--amber-300);
+}
+
+:root[data-theme='dark'] .copy-btn {
+  border-left-color: rgba(246, 235, 208, 0.1);
+}
+
+:root[data-theme='dark'] .copy-btn:hover {
+  background: rgba(246, 235, 208, 0.08);
+  color: #faf0d7;
+}
+
+:root[data-theme='dark'] .copy-btn__done {
+  color: #efc16e;
+}
+
+:root[data-theme='dark'] .copy-btn.is-copied {
+  background: rgba(239, 193, 110, 0.2);
+}
+
+:root[data-theme='dark'] .polaroid-photo-btn:focus-visible,
+:root[data-theme='dark'] .slideshow-toggle:focus-visible,
+:root[data-theme='dark'] .theme-toggle:focus-visible,
+:root[data-theme='dark'] .link-anchor:focus-visible,
+:root[data-theme='dark'] .copy-btn:focus-visible {
+  outline-color: var(--amber-300);
+}
+
 /* Responsive Mobile Layout */
 @media (max-width: 780px) {
   .booth-card {
     max-width: 470px;
+    margin: auto auto 0;
     border-radius: 24px;
+  }
+
+  .theme-toggle {
+    position: static;
+    margin: 1.25rem auto auto;
   }
 
   .booth-grid {

@@ -467,4 +467,65 @@ export function attachMotion(
       }, 1500);
     });
   });
+
+  // Light / Dark theme toggle (auto-follows host setting until manually toggled)
+  const themeBtn = root.querySelector<HTMLButtonElement>('.theme-toggle');
+  const themeLabel = root.querySelector<HTMLElement>('.theme-toggle__label');
+  const themeMeta = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]');
+  const darkMedia = window.matchMedia('(prefers-color-scheme: dark)');
+
+  const getSavedTheme = (): 'light' | 'dark' | null => {
+    try {
+      const value = localStorage.getItem('theme');
+      return value === 'dark' || value === 'light' ? value : null;
+    } catch {
+      return null;
+    }
+  };
+
+  const applyTheme = (theme: 'light' | 'dark', persist: boolean) => {
+    document.documentElement.dataset.theme = theme;
+    themeMeta?.setAttribute('content', theme === 'dark' ? '#21080E' : '#F4E6C3');
+
+    if (themeBtn) {
+      themeBtn.setAttribute(
+        'aria-label',
+        theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode',
+      );
+    }
+    if (themeLabel) {
+      themeLabel.textContent = theme === 'dark' ? 'light mode' : 'dark mode';
+    }
+
+    if (persist) {
+      try {
+        localStorage.setItem('theme', theme);
+      } catch {
+        // Ignore storage errors in private browsing modes
+      }
+    }
+  };
+
+  const initialTheme: 'light' | 'dark' =
+    document.documentElement.dataset.theme === 'dark'
+      ? 'dark'
+      : document.documentElement.dataset.theme === 'light'
+        ? 'light'
+        : darkMedia.matches
+          ? 'dark'
+          : 'light';
+
+  applyTheme(initialTheme, false);
+
+  themeBtn?.addEventListener('click', () => {
+    const current =
+      document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light';
+    applyTheme(current === 'dark' ? 'light' : 'dark', true);
+  });
+
+  darkMedia.addEventListener('change', (event) => {
+    if (!getSavedTheme()) {
+      applyTheme(event.matches ? 'dark' : 'light', false);
+    }
+  });
 }
