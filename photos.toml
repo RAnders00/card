@@ -1,0 +1,25 @@
+# Reusable photographer definitions.
+# Reference a photographer key (e.g. "isukan") in [[photos]] below.
+
+[photographers.isukan]
+name = "Isukan"
+url = "https://linktr.ee/Isukan" # Add photographer profile/website URL to turn the credit into a link
+
+[photographers.mabs]
+name = "MabsFloof"
+url = "https://x.com/MabsFloof"
+
+# Photos included in the Polaroid stack rotation.
+# Store image files inside the photos/ directory and reference their filename below.
+
+[[photos]]
+file = "headshot.jpg"
+alt = "randers the lynx fursuiter wearing a flower crown and holding a plush alien"
+photographer = "isukan"
+source = "https://www.furtrack.com/p/2217584" # Optional post URL; when set, shows a right-aligned "View post" link
+
+[[photos]]
+file = "headshot2.jpg"
+alt = "Close-up of randers the lynx fursuiter wearing a flower crown under pink and blue lighting"
+photographer = "mabs"
+source = "https://www.furtrack.com/p/2196017"

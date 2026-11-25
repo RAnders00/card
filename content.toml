@@ -1,0 +1,45 @@
+# Site content & metadata for randers.me
+# Edit this file to update text or social links.
+# Photos and photographer credits are configured separately in photos.toml.
+
+[meta]
+title = "randers"
+url = "https://randers.me"
+
+[profile]
+name = "randers"
+# Optional ISO 8601 date of birth (YYYY-MM-DD) used to substitute {age} in bio
+birthday = 2000-03-31
+bio = "Lynx fursuiter based in Germany. {age} yo. I meow in English/German :3"
+
+# Social links rendered in order.
+# Built-in icons: "x", "bluesky", "furtrack", "instagram", "telegram"
+[[links]]
+platform = "x"
+label = "X/Twitter"
+handle = "@randfurs"
+url = "https://x.com/randfurs"
+
+[[links]]
+platform = "bluesky"
+label = "Bluesky"
+handle = "@randers.me"
+url = "https://bsky.app/profile/randers.me"
+
+[[links]]
+platform = "furtrack"
+label = "Furtrack"
+handle = "character:randers"
+url = "https://www.furtrack.com/index/character:randers"
+
+[[links]]
+platform = "instagram"
+label = "Instagram"
+handle = "@randfurs"
+url = "https://instagram.com/randfurs"
+
+[[links]]
+platform = "telegram"
+label = "Telegram"
+handle = "@randfurs"
+url = "https://t.me/randfurs"
