@@ -45,6 +45,14 @@ export interface PhotosConfig {
 
 export interface ResolvedPhoto {
   src: string;
+  srcset: string;
+  sizes: string;
+  sources: {
+    avif?: string;
+    webp?: string;
+  };
+  width: number;
+  height: number;
   alt: string;
   photographerName: string;
   photographerUrl: string;

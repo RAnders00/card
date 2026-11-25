@@ -349,6 +349,12 @@ body {
   box-shadow: inset 0 0 0 1px rgba(61, 12, 23, 0.1);
 }
 
+.polaroid-picture {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
 .polaroid-img {
   display: block;
   width: 100%;

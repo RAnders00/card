@@ -30,7 +30,7 @@ npm run dev
 npm run build
 ```
 
-Static output is generated in `dist/` (including the preview photo).
+Static output is generated in `dist/` with build-time responsive **AVIF**, **WebP**, and **JPEG** (`320w`, `640w`, `960w`) image variants plus an optimized OpenGraph preview photo.
 
 ## GitHub Pages Deployment
 

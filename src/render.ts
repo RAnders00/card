@@ -44,16 +44,45 @@ export function createPolaroidCard(
   photoBtn.setAttribute('aria-label', `${photo.alt} — click for another photo`);
 
   const viewport = createEl('span', 'polaroid-viewport');
+  const picture = createEl('picture', 'polaroid-picture');
+
+  if (photo.sources.avif) {
+    const avifSource = createEl('source');
+    avifSource.type = 'image/avif';
+    avifSource.srcset = photo.sources.avif;
+    avifSource.sizes = photo.sizes;
+    picture.appendChild(avifSource);
+  }
+
+  if (photo.sources.webp) {
+    const webpSource = createEl('source');
+    webpSource.type = 'image/webp';
+    webpSource.srcset = photo.sources.webp;
+    webpSource.sizes = photo.sizes;
+    picture.appendChild(webpSource);
+  }
+
   const img = createEl('img', 'polaroid-img');
   img.src = photo.src;
+  if (photo.srcset) {
+    img.srcset = photo.srcset;
+    img.sizes = photo.sizes;
+  }
+  img.width = photo.width;
+  img.height = photo.height;
   img.alt = photo.alt;
   img.decoding = 'async';
   img.loading = 'eager';
+  if (isInitial) {
+    img.setAttribute('fetchpriority', 'high');
+  }
+
+  picture.appendChild(img);
 
   const sheen = createEl('span', 'polaroid-sheen');
   sheen.setAttribute('aria-hidden', 'true');
 
-  viewport.append(img, sheen);
+  viewport.append(picture, sheen);
   photoBtn.appendChild(viewport);
 
   const caption = createEl('figcaption', 'polaroid-caption');
