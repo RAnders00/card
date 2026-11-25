@@ -121,7 +121,6 @@ body {
   transition:
     padding 0.42s var(--ease-spring),
     max-width 0.42s var(--ease-spring);
-  animation: card-enter 0.75s var(--ease-spring) both;
 }
 
 .booth-card::before {
@@ -181,7 +180,6 @@ body {
   width: 100%;
   transform-style: preserve-3d;
   transform: rotateX(var(--tilt-x)) rotateY(var(--tilt-y));
-  animation: stack-enter 0.85s var(--ease-spring) 0.08s both;
 }
 
 /* Lynx Paw Tap Guide Overlay */
@@ -456,11 +454,6 @@ body {
   min-width: 0;
 }
 
-.profile-header,
-.link-item {
-  animation: stagger-rise 0.68s var(--ease-spring) calc(var(--stagger, 0) * 65ms + 80ms) both;
-}
-
 .profile-name {
   margin: 0;
   font-family: var(--font-display);
@@ -680,28 +673,6 @@ body {
 }
 
 /* Keyframes */
-@keyframes card-enter {
-  from {
-    opacity: 0;
-    transform: translateY(18px) scale(0.985);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-@keyframes stack-enter {
-  from {
-    opacity: 0;
-    transform: translateY(20px) scale(0.96);
-  }
-  to {
-    opacity: 1;
-    transform: rotateX(var(--tilt-x)) rotateY(var(--tilt-y));
-  }
-}
-
 @keyframes polaroid-drop {
   0% {
     opacity: 0;
@@ -773,17 +744,6 @@ body {
   100% {
     opacity: 0;
     transform: scale(1.55);
-  }
-}
-
-@keyframes stagger-rise {
-  from {
-    opacity: 0;
-    transform: translateY(12px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
   }
 }
 

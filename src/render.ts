@@ -193,7 +193,6 @@ export function renderSite(
   const infoColumn = createEl('section', 'info-column');
 
   const header = createEl('header', 'profile-header');
-  header.style.setProperty('--stagger', '1');
 
   const nameHeading = createEl('h1', 'profile-name', content.profile.name);
   const bio = createEl('p', 'profile-bio', resolvedBio);
@@ -205,9 +204,8 @@ export function renderSite(
 
   const linksList = createEl('ul', 'links-list');
 
-  content.links.forEach((link, index) => {
+  content.links.forEach((link) => {
     const li = createEl('li', 'link-item');
-    li.style.setProperty('--stagger', String(index + 2));
 
     const anchor = createEl('a', 'link-anchor');
     anchor.href = link.url;
